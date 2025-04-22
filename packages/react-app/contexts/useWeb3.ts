@@ -10,24 +10,54 @@ import {
     parseEther,
     stringToHex,
 } from "viem";
-import { celoAlfajores } from "viem/chains";
+import { celo, celoAlfajores } from "viem/chains";
 
-const publicClient = createPublicClient({
+// For testnet (Alfajores)
+const publicClientTestnet = createPublicClient({
     chain: celoAlfajores,
     transport: http(),
 });
 
-const cUSDTokenAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // Testnet
-const MINIPAY_NFT_CONTRACT = "0xE8F4699baba6C86DA9729b1B0a1DA1Bd4136eFeF"; // Testnet
+// For mainnet
+const publicClientMainnet = createPublicClient({
+    chain: celo,
+    transport: http(),
+});
+
+// Testnet addresses
+const cUSDTokenAddressTestnet = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // Testnet
+const MINIPAY_NFT_CONTRACT_TESTNET = "0xE8F4699baba6C86DA9729b1B0a1DA1Bd4136eFeF"; // Testnet
+
+// Mainnet addresses - Replace these with actual mainnet addresses when available
+const cUSDTokenAddressMainnet = "0x765DE816845861e75A25fCA122bb6898B8B1282a"; // Mainnet cUSD
 
 export const useWeb3 = () => {
     const [address, setAddress] = useState<string | null>(null);
+    const [isMainnet, setIsMainnet] = useState<boolean>(false);
+
+    // Get the appropriate chain and client based on network selection
+    const getChain = () => isMainnet ? celo : celoAlfajores;
+    const getPublicClient = () => isMainnet ? publicClientMainnet : publicClientTestnet;
+    const getCUSDAddress = () => isMainnet ? cUSDTokenAddressMainnet : cUSDTokenAddressTestnet;
+    const getNFTContractAddress = () => isMainnet ? MINIPAY_NFT_CONTRACT_TESTNET : MINIPAY_NFT_CONTRACT_TESTNET; // Using testnet for both until mainnet is available
+
+    // Toggle between mainnet and testnet
+    const toggleNetwork = () => {
+        setIsMainnet(!isMainnet);
+    };
 
     const getUserAddress = async () => {
         if (typeof window !== "undefined" && window.ethereum) {
+            // Check if user is using MiniPay wallet
+            const isMiniPay = window.ethereum.isMiniPay;
+
+            if (isMiniPay) {
+                console.log("MiniPay wallet detected");
+            }
+
             let walletClient = createWalletClient({
                 transport: custom(window.ethereum),
-                chain: celoAlfajores,
+                chain: getChain(),
             });
 
             let [address] = await walletClient.getAddresses();
@@ -38,7 +68,7 @@ export const useWeb3 = () => {
     const sendCUSD = async (to: string, amount: string) => {
         let walletClient = createWalletClient({
             transport: custom(window.ethereum),
-            chain: celoAlfajores,
+            chain: getChain(),
         });
 
         let [address] = await walletClient.getAddresses();
@@ -46,14 +76,14 @@ export const useWeb3 = () => {
         const amountInWei = parseEther(amount);
 
         const tx = await walletClient.writeContract({
-            address: cUSDTokenAddress,
+            address: getCUSDAddress(),
             abi: StableTokenABI.abi,
             functionName: "transfer",
             account: address,
             args: [to, amountInWei],
         });
 
-        let receipt = await publicClient.waitForTransactionReceipt({
+        let receipt = await getPublicClient().waitForTransactionReceipt({
             hash: tx,
         });
 
@@ -63,13 +93,13 @@ export const useWeb3 = () => {
     const mintMinipayNFT = async () => {
         let walletClient = createWalletClient({
             transport: custom(window.ethereum),
-            chain: celoAlfajores,
+            chain: getChain(),
         });
 
         let [address] = await walletClient.getAddresses();
 
         const tx = await walletClient.writeContract({
-            address: MINIPAY_NFT_CONTRACT,
+            address: getNFTContractAddress(),
             abi: MinipayNFTABI.abi,
             functionName: "safeMint",
             account: address,
@@ -79,7 +109,7 @@ export const useWeb3 = () => {
             ],
         });
 
-        const receipt = await publicClient.waitForTransactionReceipt({
+        const receipt = await getPublicClient().waitForTransactionReceipt({
             hash: tx,
         });
 
@@ -89,13 +119,13 @@ export const useWeb3 = () => {
     const getNFTs = async () => {
         let walletClient = createWalletClient({
             transport: custom(window.ethereum),
-            chain: celoAlfajores,
+            chain: getChain(),
         });
 
         const minipayNFTContract = getContract({
             abi: MinipayNFTABI.abi,
-            address: MINIPAY_NFT_CONTRACT,
-            client: publicClient,
+            address: getNFTContractAddress(),
+            client: getPublicClient(),
         });
 
         const [address] = await walletClient.getAddresses();
@@ -117,7 +147,7 @@ export const useWeb3 = () => {
     const signTransaction = async () => {
         let walletClient = createWalletClient({
             transport: custom(window.ethereum),
-            chain: celoAlfajores,
+            chain: getChain(),
         });
 
         let [address] = await walletClient.getAddresses();
@@ -130,12 +160,42 @@ export const useWeb3 = () => {
         return res;
     };
 
+    // Create a wallet client directly (similar to your provided code)
+    const createClient = async () => {
+        if (typeof window !== "undefined" && window.ethereum) {
+            try {
+                // Check if user is using MiniPay wallet
+                const isMiniPay = window.ethereum.isMiniPay;
+
+                if (isMiniPay) {
+                    console.log("MiniPay wallet detected in createClient");
+                }
+
+                const client = createWalletClient({
+                    chain: getChain(),
+                    transport: custom(window.ethereum),
+                });
+
+                const [address] = await client.getAddresses();
+                setAddress(address);
+                return { client, address, isMiniPay };
+            } catch (error) {
+                console.error("Error creating wallet client:", error);
+                return null;
+            }
+        }
+        return null;
+    };
+
     return {
         address,
+        isMainnet,
         getUserAddress,
         sendCUSD,
         mintMinipayNFT,
         getNFTs,
         signTransaction,
+        toggleNetwork,
+        createClient,
     };
 };
