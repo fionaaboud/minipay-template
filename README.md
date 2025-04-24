@@ -1,22 +1,10 @@
 <!-- TITLE -->
 <p align="center">
   <img width="100px" src="https://github.com/celo-org/celo-composer/blob/main/images/readme/celo_isotype.svg" align="center" alt="Celo" />
- <h2 align="center">Celo Composer - MiniPay Template</h2>
- <p align="center">Build, deploy, and iterate quickly on decentralized applications using Celo for MiniPay.</p>
+ <h2 align="center">Netsplit - Bill Splitting App for MiniPay</h2>
+ <p align="center">A decentralized bill splitting application built on Celo for MiniPay integration.</p>
 </p>
   <p align="center">
-    <a href="https://github.com/celo-org/celo-composer/graphs/stars">
-      <img alt="GitHub Contributors" src="https://img.shields.io/github/stars/celo-org/celo-composer?color=FCFF52" />
-    </a>
-    <a href="https://github.com/celo-org/celo-composer/graphs/contributors">
-      <img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/celo-org/celo-composer?color=E7E3D4" />
-    </a>
-    <a href="https://github.com/celo-org/celo-composer/issues">
-      <img alt="Issues" src="https://img.shields.io/github/issues/celo-org/celo-composer?color=E7E3D4" />
-    </a>
-    <a href="https://github.com/celo-org/celo-composer/pulls">
-      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/celo-org/celo-composer?color=E7E3D4" />
-    </a>
     <a href="https://opensource.org/license/mit/">
       <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
     </a>
@@ -29,26 +17,17 @@
   <summary>Table of Contents</summary>
   <ol>
     <li><a href="#about-the-project">About The Project</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#built-with">Built With</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
       <ol>
-        <li><a href="#built-with">Built With</a></li>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#minipay">MiniPay</a></li>
-     </ol>
-    <li><a href="#how-to-use-celo-composer">How to use Celo Composer</a></li>
-        <ol>
-          <li><a href="#install-dependencies">Install Dependencies</a></li>
-          <li><a href="#deploy-a-smart-contract">Deploy a Smart Contract</a></li>
-          <li><a href="#deploy-your-dapp-locally">Deploy your Dapp Locally</a></li>
-          <li><a href="#add-ui-components">Add UI Components</a></li>
-          <li><a href="#deploy-with-vercel">Deploy with Vercel</a></li>
-          <li><a href="#supported-frameworks">Supported Frameworks</a></li>
-        </ol>
+        <li><a href="#installation">Installation</a></li>
+      </ol>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#support">Support</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#currency-support">Currency Support</a></li>
+    <li><a href="#minipay-integration">MiniPay Integration</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
   </ol>
 </div>
 
@@ -56,203 +35,164 @@
 
 ## About The Project
 
-Celo Composer allows you to quickly build, deploy, and iterate on decentralized applications using Celo. It provides a number of frameworks, templates, deployment and component support, and Celo specific functionality to help you get started with your next dApp. 
+Netsplit is a decentralized bill splitting application built on the Celo blockchain with MiniPay integration. It allows users to create groups, add expenses, split bills in various ways, and settle debts using Celo's stablecoins (cUSD, cEUR, cREAL).
 
-It is the perfect lightweight starter-kit for any hackathon and for quickly testing out integrations and deployments on Celo.
+The app provides a seamless experience for managing shared expenses among friends, roommates, or any group that needs to split costs. With multi-currency support and integration with the MiniPay wallet, users can easily track and settle debts in their preferred currency.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+## Features
+
+Netsplit offers a comprehensive set of features for bill splitting and expense management:
+
+- **Group Management**
+  - Create and manage expense groups
+  - Add members to groups via email
+  - Track group expenses and balances
+
+- **Expense Splitting**
+  - Equal splits: divide expenses equally among group members
+  - Custom splits: specify exact amounts for each member
+  - Percentage splits: allocate expenses by percentage
+
+- **Multi-Currency Support**
+  - Support for Celo stablecoins (cUSD, cEUR, cREAL)
+  - Currency conversion using Mento Protocol rates
+  - Set individual currency preferences
+
+- **Balance Tracking**
+  - View overall group balances
+  - See detailed breakdown of who owes what
+  - Track payment history
+
+- **Payment Integration**
+  - Pay directly through MiniPay wallet
+  - Support for web3 wallet connections
+  - Transaction history and confirmation
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Built With
 
-Celo Composer is built on Celo to make it simple to build dApps using a variety of front-end frameworks, and libraries.
+Netsplit is built using modern web technologies and blockchain tools:
 
-- [Celo](https://celo.org/)
-- [Solidity](https://docs.soliditylang.org/en/v0.8.19/)
-- [Hardhat](https://hardhat.org/)
-- [React.js](https://reactjs.org/)
-- [Next.js](https://nextjs.org/)
-- [viem](https://viem.sh/)
-- [Tailwind](https://tailwindcss.com/)
+- [Celo](https://celo.org/) - Mobile-first blockchain platform
+- [React.js](https://reactjs.org/) - Frontend framework
+- [Next.js](https://nextjs.org/) - React framework for production
+- [Viem](https://viem.sh/) - TypeScript interface for Ethereum
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Mento Protocol](https://github.com/mento-protocol/mento-deployment) - For currency exchange rates
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<!-- GETTING STARTED -->
+## Getting Started
 
-## Prerequisites
+### Prerequisites
 
-- Node (v20 or higher)
+- Node.js (v20 or higher)
 - Git (v2.38 or higher)
+- A MiniPay wallet or other web3 wallet
 
-## MiniPay
+### Installation
 
-Welcome to the [MiniPay](https://www.opera.com/products/minipay) wallet integration guide. MiniPay is one of the fastest growing wallets that was built out by Opera on Celo that seeks to create a simple user experience to use DApps. MiniPay is available as a standalone app and inside the Opera Mini browser on Android phones thereby allowing DApp developers to tap into a distribution of 100M users on integration.
+1. Clone the repository
+   ```sh
+   git clone https://github.com/fionaaboud/minipay-template.git
+   cd minipay-template
+   ```
 
-This guide provides information on how to develop and test your dapp for MiniPay.
-
-To get started with MiniPay, we recommend testing the wallet and building a sample dApp using our starter kit. The following steps will guide you through setting up MiniPay, building your dApp, and testing it in the wallet.
-
-:::info
-Install the new [MiniPay standalone app](https://play.google.com/store/apps/details?id=com.opera.minipay) now! 🎉 📥
-:::
-
-## How to use Celo Composer - MiniPay template
-
-The easiest way to start with Celo Composer is using `@celo/celo-composer`. This CLI tool lets you quickly start building dApps on Celo, including several templates. To get started, just run the following command, and follow the steps:
-
-- Step 1
-
-```bash
-npx @celo/celo-composer@latest create
-```
-
-- Step 2: Provide the Project Name: You will be prompted to enter the name of your project.
-
-```text
-What is your project name: 
-```
-
-- Step 3: Choose to Use Hardhat: You will be asked if you want to use Hardhat. Select Yes or No.
-
-```text
-Do you want to use Hardhat? (Y/n)
-```
-
-- Step 4: Choose to Use a Template: You will be asked if you want to use a template. Select `Yes` .
-
-```text
-Do you want to use a template?
-```
-
-- Step 5: Select a Template: If you chose to use a template, you will be prompted to select `MiniPay` from the list provided.
-
-- Step 6: Provide the Project Owner's Name: You will be asked to enter the project owner's name.
-
-```text
-Project Owner name:
-```
-
-- Step 7: Wait for Project Creation: The CLI will now create the project based on your inputs. This may take a few minutes.
-
-- Step 8: Follow the instructions to start the project. The same will be displayed on the console after the project is created.
-
-```text
-🚀 Your starter project has been successfully created!
-```
-
-## Install Dependencies
-
-
-Once your custom dApp has been created, just install dependencies, either with yarn:
-
-```bash
+2. Install dependencies
+   ```sh
    yarn
-```
-
-If you prefer npm, you can run:
-
-```bash
+   # or
    npm install
-```
+   ```
 
-## Deploy a Smart Contract
+3. Set up environment variables
+   ```sh
+   cp packages/react-app/.env.template packages/react-app/.env
+   ```
+   Then add your WalletConnect Cloud Project ID to the .env file
 
-Find the detailed instructions on how to run your smart contract in [packages/hardhat/README.md](./packages/hardhat/README.md).
-
-For quick development follow these three steps:
-
-1. Change `packages/hardhat/env.template` to `packages/hardhat/env` and add your `PRIVATE_KEY` into the `.env` file.
-2. Make sure your wallet is funded when deploying to testnet or mainnet. You can get test tokens for deploying it on Alfajores from the [Celo Faucet](https://faucet.celo.org/alfajores).
-3. Run the following commands from the `packages/hardhat` folder to deploy your smart contract to the Celo Testnet Alfajores:
-
-```bash
-npx hardhat ignition deploy ./ignition/modules/MiniPay.ts --network alfajores
-```
-
-## Deploy your Dapp Locally
-
-Find the detailed instructions on how to run your frontend in the [`react-dapp` README.md](./packages/react-app/README.md).
-
-Before you start the project, please follow these steps:
-
-1. Rename the file:
-   packages/react-app/.env.template
-   to
-   packages/react-app/.env
-
-2. Open the newly renamed .env file and add your WalletConnect Cloud Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/)
-
-Once you've done that, you're all set to start your project!
-
-Run the following commands from the `packages/react-app` folder to start the project:
-
-```bash
+4. Start the development server
+   ```sh
+   cd packages/react-app
    yarn dev
-```
-
-If you prefer npm, you can run:
-
-```bash
+   # or
    npm run dev
-```
+   ```
 
-Thank you for using Celo Composer! If you have any questions or need further assistance, please refer to the README or reach out to our team.
-
-**_🔥Voila, you have a dApp ready to go. Start building your dApp on Celo._**
-
-
-## Add UI Components
-
-To keep the Celo Composer as lightwieght as possible we didn't add any components but rather a guide on how to add the components you need yourself with a very simple to use components library. To learn how to add UI components using [ShadCN](https://ui.shadcn.com/) in this project, refer to the [UI Components Guide](./docs/UI_COMPONENTS.md).
-
-## Deploy with Vercel
-
-The Celo Composer is a great tool for hackathons and fast deployments. We created a guide for you, using the Vercel CLI to create a live deployment in minutes. For detailed instructions on deploying the Next.js app using Vercel CLI, refer to the [Deployment Guide](./docs/DEPLOYMENT_GUIDE.md).
-
-
-## Supported Frameworks
-
-### React / Nextjs
-
-- Support for Website and Progressive Web Application.
-- Works with all major crypto wallets.
-
-Check [nextjs docs](https://nextjs.org/docs) to learn more about it.
-
-### Hardhat
-
-- Robust framework for building and testing smart contracts.
-- Compatible with various Ethereum development tools and plugins.
-
-Check [hardhat docs](https://hardhat.org/hardhat-runner/docs/getting-started) to learn more about it.
-
-## Support
-
-Join the Celo Discord server at <https://chat.celo.org>. Reach out on the dedicated repo channel [here](https://discord.com/channels/600834479145353243/941003424298856448).
-
-<!-- ROADMAP -->
-
-## Roadmap
-
-See the [open issues](https://github.com/celo-org/celo-composer/issues) for a full list of proposed features (and known issues).
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<!-- CONTRIBUTING -->
+## Usage
 
-## Contributing
+### Creating a Group
 
-We welcome contributions from the community.
+1. Navigate to the Netsplit app
+2. Click "Create Group"
+3. Enter a group name and add members by email
+4. Your group is now ready for expense tracking
+
+### Adding an Expense
+
+1. Open a group
+2. Click "Add Expense"
+3. Enter expense details (title, amount, currency)
+4. Select who paid and how to split the expense
+5. Save the expense
+
+### Viewing Balances
+
+1. Open a group
+2. Click "Balances" to see an overview
+3. View detailed breakdowns of who owes what
+4. Click on individual balances for more details
+
+### Settling Debts
+
+1. Navigate to the balance details
+2. Click "Pay" next to the amount you owe
+3. Confirm the payment through your connected wallet
+4. The balance will update automatically
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+## Currency Support
+
+Netsplit supports multiple currencies through the Mento Protocol:
+
+- **cUSD (Celo Dollar)**: The default currency for all balances
+- **cEUR (Celo Euro)**: European currency option
+- **cREAL (Celo Brazilian Real)**: Brazilian currency option
+
+Users can:
+- Enter expenses in any supported currency
+- Set their preferred currency for display
+- Pay in any supported currency
+
+All balances are standardized in cUSD for consistency, with conversion rates provided by the Mento Protocol.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+## MiniPay Integration
+
+Netsplit is designed to work seamlessly with [MiniPay](https://www.opera.com/products/minipay), Opera's wallet built on Celo:
+
+- **Automatic Detection**: The app detects when it's running inside MiniPay
+- **Simplified Authentication**: Uses MiniPay's built-in wallet connection
+- **Streamlined Payments**: Direct integration for settling debts
+
+To use Netsplit with MiniPay:
+1. Install the [MiniPay app](https://play.google.com/store/apps/details?id=com.opera.minipay)
+2. Open the Netsplit app URL in MiniPay
+3. The app will automatically connect to your MiniPay wallet
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<!-- CONTACT -->
-## Contact
-
-- [@CeloDevs](https://twitter.com/CeloDevs)
-- [Discord](https://discord.com/invite/celo)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
