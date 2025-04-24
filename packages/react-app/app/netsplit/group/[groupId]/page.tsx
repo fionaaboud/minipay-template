@@ -4,12 +4,14 @@ import { useNetsplit } from '@/contexts/useNetsplit';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Balance, Expense, Payment, SplitType } from '@/types/netsplit';
+import MentoService from '@/services/mentoService';
 import AddMemberDialog from '@/components/netsplit/AddMemberDialog';
 import AddExpenseDialog from '@/components/netsplit/AddExpenseDialog';
 import ViewBalancesDialog from '@/components/netsplit/ViewBalancesDialog';
 import TransactionsList from '@/components/netsplit/TransactionsList';
 import UniversalPayButton from '@/components/netsplit/UniversalPayButton';
 import BalanceDetailDialog from '@/components/netsplit/BalanceDetailDialog';
+import CurrencyPreferenceDialog from '@/components/netsplit/CurrencyPreferenceDialog';
 
 export default function GroupDetailPage() {
   const { groupId } = useParams();
@@ -25,6 +27,7 @@ export default function GroupDetailPage() {
   const [showAddExpenseDialog, setShowAddExpenseDialog] = useState(false);
   const [showBalancesDialog, setShowBalancesDialog] = useState(false);
   const [showBalanceDetailDialog, setShowBalanceDetailDialog] = useState(false);
+  const [showCurrencyPreferenceDialog, setShowCurrencyPreferenceDialog] = useState(false);
   const [selectedBalance, setSelectedBalance] = useState<Balance | null>(null);
   const [transactions, setTransactions] = useState<(Expense | Payment)[]>([]);
 
@@ -115,24 +118,14 @@ export default function GroupDetailPage() {
           </button>
 
           <button
-            onClick={() => {
-              // Share group functionality
-              if (navigator.share) {
-                navigator.share({
-                  title: 'Netsplit',
-                  text: `Join my bill splitting group: ${currentGroup.name}`,
-                  url: window.location.href
-                });
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Link copied to clipboard!');
-              }
-            }}
+            onClick={() => setShowCurrencyPreferenceDialog(true)}
             className="flex items-center bg-gray-100 px-3 py-1 rounded-full text-sm whitespace-nowrap"
           >
-            <span className="material-icons text-sm mr-1">share</span>
-            Share
+            <span className="material-icons text-sm mr-1">currency_exchange</span>
+            Currency
           </button>
+
+          {/* Share button removed as it was out of frame */}
         </div>
 
         {userBalance && (
@@ -215,6 +208,13 @@ export default function GroupDetailPage() {
           groupId={currentGroup.id}
         />
       )}
+
+      <CurrencyPreferenceDialog
+        open={showCurrencyPreferenceDialog}
+        onClose={() => setShowCurrencyPreferenceDialog(false)}
+        groupId={currentGroup.id}
+        currentUserEmail={currentUserEmail || ''}
+      />
     </div>
   );
 }

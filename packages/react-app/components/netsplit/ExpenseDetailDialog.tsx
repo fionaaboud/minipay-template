@@ -32,6 +32,20 @@ export default function ExpenseDetailDialog({
     });
   };
 
+  // Convert any currency to cUSD
+  const convertToCUSD = (amount: number, currency: string = 'cUSD'): number => {
+    if (currency === 'cUSD') return amount;
+
+    // Use the mock conversion rates for now
+    if (currency === 'cEUR') {
+      return amount * 1.08; // 1 EUR = 1.08 USD
+    } else if (currency === 'cREAL') {
+      return amount * 0.2; // 1 REAL = 0.2 USD
+    }
+
+    return amount; // Default fallback
+  };
+
   // Calculate total amount owed by others
   const totalOwed = expense.splitWith.reduce((sum, split) => sum + split.amount, 0);
 
@@ -62,7 +76,11 @@ export default function ExpenseDetailDialog({
         <div className="bg-gray-50 p-4 rounded-lg mb-4">
           <div className="flex justify-between items-center">
             <div className="text-gray-600">Total amount</div>
-            <div className="text-xl font-bold">${expense.amount.toFixed(2)}</div>
+            <div className="text-xl font-bold">
+              {expense.currency === 'cUSD'
+                ? `$${expense.amount.toFixed(2)}`
+                : `${expense.currency} ${expense.amount.toFixed(2)} (≈ $${convertToCUSD(expense.amount, expense.currency).toFixed(2)})`}
+            </div>
           </div>
           <div className="text-sm text-gray-500 mt-1">
             {formatDate(expense.timestamp)}
@@ -110,7 +128,9 @@ export default function ExpenseDetailDialog({
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <div className="font-medium mr-2">${split.amount.toFixed(2)}</div>
+                  <div className="font-medium mr-2">
+                    ${split.amount.toFixed(2)}
+                  </div>
                   {split.isPaid ? (
                     <span className="text-green-500 text-xs bg-green-100 px-2 py-1 rounded-full">Paid</span>
                   ) : (
@@ -125,7 +145,9 @@ export default function ExpenseDetailDialog({
         {isCurrentUserPayer && (
           <div className="mt-6 p-4 bg-green-50 rounded-lg">
             <div className="font-medium text-green-800">You are owed</div>
-            <div className="text-xl font-bold text-green-700">${totalOwed.toFixed(2)}</div>
+            <div className="text-xl font-bold text-green-700">
+              ${totalOwed.toFixed(2)}
+            </div>
             <div className="text-sm text-green-600 mt-1">
               {expense.splitWith.filter(s => !s.isPaid).length} people still need to pay
             </div>
@@ -135,7 +157,9 @@ export default function ExpenseDetailDialog({
         {currentUserSplit && !currentUserSplit.isPaid && (
           <div className="mt-6 p-4 bg-red-50 rounded-lg">
             <div className="font-medium text-red-800">You owe</div>
-            <div className="text-xl font-bold text-red-700">${currentUserSplit.amount.toFixed(2)}</div>
+            <div className="text-xl font-bold text-red-700">
+              ${currentUserSplit.amount.toFixed(2)}
+            </div>
             <div className="text-sm text-red-600 mt-1">
               to {expense.paidByName}
             </div>

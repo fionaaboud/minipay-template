@@ -50,7 +50,10 @@ interface Web3ContextType {
   connectWallet: (walletType?: WalletType) => Promise<boolean>;
   disconnectWallet: () => void;
   sendCUSD: (to: string, amount: string) => Promise<any>;
+  sendStablecoin: (to: string, amount: string, currency?: string) => Promise<any>;
+  getStablecoinAddress: (currency?: string) => string;
   toggleNetwork: () => void;
+  supportedCurrencies: string[];
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
@@ -176,20 +179,38 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsConnected(false);
   };
 
-  // Send cUSD
-  const sendCUSD = async (to: string, amount: string) => {
+  // Stablecoin addresses on Celo mainnet
+  const STABLECOIN_ADDRESSES = {
+    cUSD: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+    cEUR: '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73',
+    cREAL: '0xe8537a3d056DA446677B9E9d6c5dB704EaAb4787'
+  };
+
+  // Get stablecoin address
+  const getStablecoinAddress = (currency: string = 'cUSD') => {
+    return STABLECOIN_ADDRESSES[currency] || STABLECOIN_ADDRESSES.cUSD;
+  };
+
+  // Send any stablecoin
+  const sendStablecoin = async (to: string, amount: string, currency: string = 'cUSD') => {
     if (!walletClient || !address) {
       throw new Error("Wallet not connected");
     }
 
-    console.log(`Sending ${amount} cUSD to ${to}`);
+    console.log(`Sending ${amount} ${currency} to ${to}`);
     const amountInWei = parseEther(amount);
     console.log(`Amount in wei: ${amountInWei}`);
 
     try {
+      // Get the appropriate token address
+      const tokenAddress = getStablecoinAddress(currency);
+      if (!tokenAddress) {
+        throw new Error(`Unsupported currency: ${currency}`);
+      }
+
       console.log("Initiating transfer transaction...");
       const tx = await walletClient.writeContract({
-        address: getCUSDAddress(),
+        address: tokenAddress,
         abi: StableTokenABI.abi,
         functionName: "transfer",
         account: address,
@@ -206,9 +227,14 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.log("Transaction confirmed:", receipt);
       return receipt;
     } catch (error) {
-      console.error("Error sending cUSD:", error);
+      console.error(`Error sending ${currency}:`, error);
       throw error;
     }
+  };
+
+  // For backward compatibility
+  const sendCUSD = async (to: string, amount: string) => {
+    return sendStablecoin(to, amount, 'cUSD');
   };
 
   const value = {
@@ -220,7 +246,10 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
     connectWallet,
     disconnectWallet,
     sendCUSD,
+    sendStablecoin,
+    getStablecoinAddress,
     toggleNetwork,
+    supportedCurrencies: Object.keys(STABLECOIN_ADDRESSES),
   };
 
   return (

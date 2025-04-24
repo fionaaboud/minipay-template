@@ -1,8 +1,10 @@
 'use client';
 
 import { useNetsplit } from '@/contexts/useNetsplit';
+import { useWeb3Context } from '@/contexts/useWeb3Context';
 import { Member, SplitDetail, SplitType } from '@/types/netsplit';
 import { useState, useEffect } from 'react';
+import MentoService from '@/services/mentoService';
 
 interface AddExpenseDialogProps {
   open: boolean;
@@ -20,9 +22,11 @@ export default function AddExpenseDialog({
   currentUserEmail
 }: AddExpenseDialogProps) {
   const { addExpense } = useNetsplit();
+  const { supportedCurrencies } = useWeb3Context();
 
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
+  const [currency, setCurrency] = useState('cUSD');
   const [paidByEmail, setPaidByEmail] = useState(currentUserEmail);
   const [splitType, setSplitType] = useState<SplitType>(SplitType.EQUAL);
   const [customSplits, setCustomSplits] = useState<SplitDetail[]>([]);
@@ -40,12 +44,25 @@ export default function AddExpenseDialog({
       if (splitType === SplitType.CUSTOM) {
         // For custom splits, initialize with equal amounts
         const totalAmount = parseFloat(amount) || 0;
-        const equalAmount = totalAmount / eligibleMembers.length;
+
+        // Convert the total amount to cUSD if needed
+        let totalAmountInUSD = totalAmount;
+        if (currency !== 'cUSD') {
+          // Use the mock conversion rates for now
+          if (currency === 'cEUR') {
+            totalAmountInUSD = totalAmount * 1.08; // 1 EUR = 1.08 USD
+          } else if (currency === 'cREAL') {
+            totalAmountInUSD = totalAmount * 0.2; // 1 REAL = 0.2 USD
+          }
+        }
+
+        const equalAmount = totalAmountInUSD / eligibleMembers.length;
 
         const memberSplits = eligibleMembers.map(m => ({
           email: m.email,
           name: m.name,
           amount: equalAmount,
+          currency: 'cUSD', // Always use cUSD for all splits
           isPaid: false
         }));
         setCustomSplits(memberSplits);
@@ -59,7 +76,7 @@ export default function AddExpenseDialog({
         setPercentageSplits(memberPercentages);
       }
     }
-  }, [members, paidByEmail, splitType, amount]);
+  }, [members, paidByEmail, splitType, amount, currency]);
 
   if (!open) return null;
 
@@ -96,6 +113,7 @@ export default function AddExpenseDialog({
         groupId,
         title,
         amountValue,
+        currency,
         paidByEmail,
         splitType,
         splitDetails
@@ -142,14 +160,26 @@ export default function AddExpenseDialog({
     const totalAmount = parseFloat(amount);
     if (isNaN(totalAmount)) return [];
 
+    // Convert the total amount to cUSD if needed
+    let totalAmountInUSD = totalAmount;
+    if (currency !== 'cUSD') {
+      // Use the mock conversion rates for now
+      if (currency === 'cEUR') {
+        totalAmountInUSD = totalAmount * 1.08; // 1 EUR = 1.08 USD
+      } else if (currency === 'cREAL') {
+        totalAmountInUSD = totalAmount * 0.2; // 1 REAL = 0.2 USD
+      }
+    }
+
     return percentageSplits.map(split => {
       const member = members.find(m => m.email === split.email);
-      const splitAmount = (split.percentage / 100) * totalAmount;
+      const splitAmount = (split.percentage / 100) * totalAmountInUSD;
 
       return {
         email: split.email,
         name: member?.name || split.email,
         amount: splitAmount,
+        currency: 'cUSD', // Always use cUSD for all splits
         isPaid: false
       };
     });
@@ -186,15 +216,36 @@ export default function AddExpenseDialog({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Amount
           </label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0.00"
-            step="0.01"
-            min="0"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="flex space-x-2">
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              className="w-24 px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {supportedCurrencies.map(curr => (
+                <option key={curr} value={curr}>
+                  {curr}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mt-1 text-xs text-gray-500">
+            {amount && currency !== 'cUSD' && (
+              <div className="flex justify-between">
+                <span>Approximate value:</span>
+                <span>${(parseFloat(amount) * (currency === 'cEUR' ? 1.08 : currency === 'cREAL' ? 0.2 : 1)).toFixed(2)}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="mb-4">

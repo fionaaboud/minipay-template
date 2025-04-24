@@ -2,8 +2,10 @@
 
 import { useNetsplit } from '@/contexts/useNetsplit';
 import { useWeb3Context } from '@/contexts/useWeb3Context';
+import { Balance } from '@/types/netsplit';
 import { useState } from 'react';
 import UniversalPayButton from './UniversalPayButton';
+import MentoService from '@/services/mentoService';
 
 interface ViewBalancesDialogProps {
   open: boolean;
@@ -130,7 +132,9 @@ export default function ViewBalancesDialog({
                 <div key={owe.email} className="flex justify-between items-center">
                   <div>{owe.name}</div>
                   <div className="flex items-center">
-                    <span className="text-red-600 mr-3">${owe.amount.toFixed(2)}</span>
+                    <span className="text-red-600 mr-3">
+                      ${owe.amount.toFixed(2)}
+                    </span>
                     <button
                       onClick={() => {
                         setSettleToEmail(owe.email);
@@ -168,7 +172,9 @@ export default function ViewBalancesDialog({
               {currentUserBalance.isOwed.map(owed => (
                 <div key={owed.email} className="flex justify-between items-center">
                   <div>{owed.name}</div>
-                  <div className="text-green-600">${owed.amount.toFixed(2)}</div>
+                  <div className="text-green-600">
+                    ${owed.amount.toFixed(2)}
+                  </div>
                 </div>
               ))}
             </div>

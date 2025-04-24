@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { v4 as uuidv4 } from 'uuid';
 import { useWeb3Context } from './useWeb3Context';
 import { Balance, Expense, Group, Member, Payment, SplitDetail, SplitType } from '@/types/netsplit';
-import { parseEther } from 'viem';
+// Import only what we need
 
 interface NetsplitContextType {
   currentGroup: Group | null;
@@ -25,13 +25,14 @@ interface NetsplitContextType {
     groupId: string,
     title: string,
     amount: number,
+    currency: string,
     paidByEmail: string,
     splitType: SplitType,
     splitDetails?: SplitDetail[]
   ) => void;
 
   // Payment management
-  settleDebt: (groupId: string, toEmail: string, amount: string) => Promise<any>;
+  settleDebt: (groupId: string, toEmail: string, amount: string, currency?: string) => Promise<any>;
 
   // Balance calculation
   calculateBalances: (groupId: string) => Balance[];
@@ -40,7 +41,7 @@ interface NetsplitContextType {
 const NetsplitContext = createContext<NetsplitContextType | undefined>(undefined);
 
 export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { address, isMainnet, sendCUSD, walletType } = useWeb3Context();
+  const { address, sendCUSD, walletType } = useWeb3Context();
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [currentGroup, setCurrentGroup] = useState<Group | null>(null);
@@ -209,6 +210,7 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
     groupId: string,
     title: string,
     amount: number,
+    currency: string = 'cUSD',
     paidByEmail: string,
     splitType: SplitType,
     customSplitDetails?: SplitDetail[]
@@ -225,13 +227,26 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     // Calculate split based on type
     if (splitType === SplitType.EQUAL) {
-      const splitAmount = amount / group.members.length;
+      // Convert the total amount to cUSD if needed
+      let amountInUSD = amount;
+      if (currency !== 'cUSD') {
+        // Use the mock conversion rates for now
+        if (currency === 'cEUR') {
+          amountInUSD = amount * 1.08; // 1 EUR = 1.08 USD
+        } else if (currency === 'cREAL') {
+          amountInUSD = amount * 0.2; // 1 REAL = 0.2 USD
+        }
+      }
+
+      const splitAmount = amountInUSD / group.members.length;
+
       splitWith = group.members
         .filter(m => m.email !== paidByEmail) // Exclude the payer
         .map(m => ({
           email: m.email,
           name: m.name,
           amount: splitAmount,
+          currency: 'cUSD', // Always use cUSD for all splits
           isPaid: false
         }));
     } else if ((splitType === SplitType.CUSTOM || splitType === SplitType.PERCENTAGE) && customSplitDetails) {
@@ -244,6 +259,7 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
       id: uuidv4(),
       title,
       amount,
+      currency,
       paidBy: paidByEmail,
       paidByName: paidByMember.name,
       timestamp: Date.now(),
@@ -259,8 +275,8 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   // Payment management functions
-  const settleDebt = async (groupId: string, toEmail: string, amount: string): Promise<any> => {
-    console.log(`Settling debt: ${amount} to ${toEmail} in group ${groupId}`);
+  const settleDebt = async (groupId: string, toEmail: string, amount: string, currency: string = 'cUSD'): Promise<any> => {
+    console.log(`Settling debt: ${amount} ${currency} to ${toEmail} in group ${groupId}`);
     const group = groups.find(g => g.id === groupId);
     if (!group) throw new Error('Group not found');
 
@@ -275,7 +291,7 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     try {
       // Send payment using wallet
-      console.log(`Sending ${amount} cUSD to ${toMember.walletAddress}`);
+      console.log(`Sending ${amount} ${currency} to ${toMember.walletAddress}`);
       const tx = await sendCUSD(toMember.walletAddress, amount);
       console.log('Transaction successful:', tx);
 
@@ -289,6 +305,7 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
         toEmail: toEmail,
         toName: toMember.name,
         amount,
+        currency,
         timestamp: Date.now()
       };
 
@@ -362,6 +379,8 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
     const group = groups.find(g => g.id === groupId);
     if (!group) return [];
 
+    // We'll use cUSD for all balance calculations for consistency
+
     // Initialize balances for all members
     const balances: Record<string, Balance> = {};
     group.members.forEach(member => {
@@ -369,6 +388,7 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
         email: member.email,
         name: member.name,
         balance: 0,
+        preferredCurrency: 'cUSD', // Default to cUSD
         owes: [],
         isOwed: []
       };
@@ -442,25 +462,30 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
     group.members.forEach(member => {
       let totalOwed = 0;
       let totalOwes = 0;
+      // For the main balance calculation, always use cUSD
+      // For individual expenses, use the member's preferred currency when displaying
 
       // Calculate how much this member owes others
       group.members.forEach(otherMember => {
         if (member.email !== otherMember.email) {
           const owesAmount = netDebtMatrix[member.email][otherMember.email];
           if (owesAmount > 0) {
+            // For the total balance, keep everything in cUSD
             totalOwes += owesAmount;
           }
 
           // Calculate how much others owe this member
           const isOwedAmount = netDebtMatrix[otherMember.email][member.email];
           if (isOwedAmount > 0) {
+            // For the total balance, keep everything in cUSD
             totalOwed += isOwedAmount;
           }
         }
       });
 
-      // Set the overall balance
+      // Always set the overall balance in cUSD for consistency
       balances[member.email].balance = totalOwed - totalOwes;
+      balances[member.email].preferredCurrency = 'cUSD'; // Force cUSD for the main balance
     });
 
     // Build the owes and isOwed arrays based on the simplified debt matrix
@@ -473,19 +498,24 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
             // Round to 2 decimal places for display
             const roundedAmount = Math.round(debtAmount * 100) / 100;
 
-            // Add to owes list
+            // For display purposes, we'll show the amount in cUSD
+            // This ensures consistency with the main balance
+
+            // Add to owes list in cUSD
             balances[debtor.email].owes.push({
               email: creditor.email,
               name: creditor.name,
               amount: roundedAmount,
+              currency: 'cUSD', // Always use cUSD for consistency
               walletAddress: creditor.walletAddress
             });
 
-            // Add to isOwed list
+            // Add to isOwed list in cUSD
             balances[creditor.email].isOwed.push({
               email: debtor.email,
               name: debtor.name,
               amount: roundedAmount,
+              currency: 'cUSD', // Always use cUSD for consistency
               walletAddress: debtor.walletAddress
             });
 

@@ -36,6 +36,20 @@ export default function TransactionsList({
     return 'from' in transaction;
   };
 
+  // Convert any currency to cUSD
+  const convertToCUSD = (amount: number, currency: string = 'cUSD'): number => {
+    if (currency === 'cUSD') return amount;
+
+    // Use the mock conversion rates for now
+    if (currency === 'cEUR') {
+      return amount * 1.08; // 1 EUR = 1.08 USD
+    } else if (currency === 'cREAL') {
+      return amount * 0.2; // 1 REAL = 0.2 USD
+    }
+
+    return amount; // Default fallback
+  };
+
   if (transactions.length === 0) {
     return (
       <div className="text-center py-6 text-gray-500">
@@ -67,7 +81,11 @@ export default function TransactionsList({
                       {isCurrentUserPayer ? 'You paid' : `${transaction.paidByName} paid`} • {formatDate(transaction.timestamp)}
                     </div>
                   </div>
-                  <div className="text-lg font-semibold">${transaction.amount.toFixed(2)}</div>
+                  <div className="text-lg font-semibold">
+                  {transaction.currency === 'cUSD'
+                    ? `$${transaction.amount.toFixed(2)}`
+                    : `${transaction.currency} ${transaction.amount.toFixed(2)} (≈ $${convertToCUSD(transaction.amount, transaction.currency).toFixed(2)})`}
+                </div>
                 </div>
 
                 {transaction.splitWith.length > 0 && (
@@ -114,7 +132,11 @@ export default function TransactionsList({
                     Payment • {formatDate(transaction.timestamp)}
                   </div>
                 </div>
-                <div className="text-lg font-semibold">${parseFloat(transaction.amount).toFixed(2)}</div>
+                <div className="text-lg font-semibold">
+                  {transaction.currency === 'cUSD'
+                    ? `$${parseFloat(transaction.amount).toFixed(2)}`
+                    : `${transaction.currency} ${parseFloat(transaction.amount).toFixed(2)} (≈ $${convertToCUSD(parseFloat(transaction.amount), transaction.currency).toFixed(2)})`}
+                </div>
               </div>
             </div>
           );
