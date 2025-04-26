@@ -47,7 +47,7 @@ export default function NetsplitPage() {
           </ul>
         ) : (
           <div className="text-center text-gray-500 py-4">
-            You don't have any groups yet
+            You don&apos;t have any groups yet
           </div>
         )}
         
