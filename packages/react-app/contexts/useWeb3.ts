@@ -40,8 +40,8 @@ export const useWeb3 = () => {
     // Get the appropriate chain and client based on network selection
     const getChain = () => isMainnet ? celo : celoAlfajores;
     const getPublicClient = () => isMainnet ? publicClientMainnet : publicClientTestnet;
-    const getCUSDAddress = () => isMainnet ? cUSDTokenAddressMainnet : cUSDTokenAddressTestnet;
-    const getNFTContractAddress = () => isMainnet ? MINIPAY_NFT_CONTRACT_TESTNET : MINIPAY_NFT_CONTRACT_TESTNET; // Using testnet for both until mainnet is available
+    const getCUSDAddress = (): Address => isMainnet ? cUSDTokenAddressMainnet : cUSDTokenAddressTestnet; // Explicitly return Address
+    const getNFTContractAddress = (): Address => isMainnet ? MINIPAY_NFT_CONTRACT_TESTNET : MINIPAY_NFT_CONTRACT_TESTNET; // Explicitly return Address. Using testnet for both until mainnet is available
 
     // Toggle between mainnet and testnet
     const toggleNetwork = () => {
