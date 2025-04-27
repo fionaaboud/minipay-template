@@ -3,7 +3,7 @@
 import { useNetsplit } from '@/contexts/useNetsplit';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Balance, Expense, Payment, SplitType } from '@/types/netsplit';
+import { Balance, Expense, Group, Payment, SplitType } from '@/types/netsplit';
 import MentoService from '@/services/mentoService';
 import AddMemberDialog from '@/components/netsplit/AddMemberDialog';
 import AddExpenseDialog from '@/components/netsplit/AddExpenseDialog';
