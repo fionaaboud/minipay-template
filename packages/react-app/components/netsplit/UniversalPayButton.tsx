@@ -139,7 +139,7 @@ export default function UniversalPayButton({ balance, onPaymentComplete }: Unive
             </div>
             {paymentCurrency !== highestOwed.currency && (
               <div className="text-xs text-gray-500 mb-2">
-                You'll pay {MentoService.formatAmountWithCurrency(highestOwed.amount, paymentCurrency)}
+                You&apos;ll pay {MentoService.formatAmountWithCurrency(highestOwed.amount, paymentCurrency)}
                 (equivalent to {MentoService.formatAmountWithCurrency(highestOwed.amount, highestOwed.currency || 'cUSD')})
               </div>
             )}
