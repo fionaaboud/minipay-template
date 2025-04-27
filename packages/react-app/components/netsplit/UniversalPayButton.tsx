@@ -58,6 +58,15 @@ export default function UniversalPayButton({ balance, onPaymentComplete }: Unive
       // Convert amount to string with 2 decimal places
       const amountToSend = highestOwed.amount.toFixed(2);
 
+      // Ensure wallet address exists before sending (for TypeScript safety)
+      if (!highestOwed.walletAddress) {
+        // This case should theoretically not be reachable due to the check before rendering the button
+        console.error("Critical Error: handlePayBalance called without wallet address for", highestOwed.email);
+        setError("Internal error: Missing wallet address.");
+        setIsProcessing(false);
+        return;
+      }
+
       // Send the payment using the selected currency
       const tx = await sendStablecoin(highestOwed.walletAddress, amountToSend, paymentCurrency);
 
