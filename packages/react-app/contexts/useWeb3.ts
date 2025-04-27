@@ -110,7 +110,7 @@ export const useWeb3 = () => {
             functionName: "safeMint",
             account: currentAddress, // Use the non-null address
             args: [
-                address,
+                currentAddress, // Use the non-null address
                 "https://cdn-production-opera-website.operacdn.com/staticfiles/assets/images/sections/2023/hero-top/products/minipay/minipay__desktop@2x.a17626ddb042.webp",
             ],
         });
