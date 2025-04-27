@@ -88,39 +88,39 @@ export const MentoService = {
   },
 
   // Synchronous version for use in balance calculations
-  convertAmount(amount: number, fromCurrency: string, toCurrency: string): number {
-    if (fromCurrency === toCurrency) return amount;
+  // convertAmount(amount: number, fromCurrency: string, toCurrency: string): number {
+  //   if (fromCurrency === toCurrency) return amount;
 
-    // Normalize currency names
-    const from = fromCurrency.toUpperCase();
-    const to = toCurrency.toUpperCase();
+  //   // Normalize currency names
+  //   const from = fromCurrency.toUpperCase();
+  //   const to = toCurrency.toUpperCase();
 
-    const exchangeKey = `${from}_${to}`;
-    const reverseExchangeKey = `${to}_${from}`;
+  //   const exchangeKey = `${from}_${to}`;
+  //   const reverseExchangeKey = `${to}_${from}`;
 
-    // Use mock exchange rates for now
-    if (exchangeKey in MOCK_EXCHANGE_RATES) {
-      return amount * MOCK_EXCHANGE_RATES[exchangeKey as ExchangeRateKey];
-    } else if (reverseExchangeKey in MOCK_EXCHANGE_RATES) {
-      return amount / MOCK_EXCHANGE_RATES[reverseExchangeKey as ExchangeRateKey];
-    } else {
-      // If no direct rate, try to go through cUSD as the base currency
-      if (from !== 'CUSD' && to !== 'CUSD') {
-        try {
-          // Be careful with recursion here - we need to avoid infinite loops
-          const rateFromTocUSD = this.convertAmount(1, from, 'cUSD');
-          const ratecUSDToTo = this.convertAmount(1, 'cUSD', to);
-          return amount * rateFromTocUSD * ratecUSDToTo;
-        } catch (e) {
-          console.warn('Error in recursive conversion:', e);
-        }
-      }
+  //   // Use mock exchange rates for now
+  //   if (exchangeKey in MOCK_EXCHANGE_RATES) {
+  //     return amount * MOCK_EXCHANGE_RATES[exchangeKey as ExchangeRateKey];
+  //   } else if (reverseExchangeKey in MOCK_EXCHANGE_RATES) {
+  //     return amount / MOCK_EXCHANGE_RATES[reverseExchangeKey as ExchangeRateKey];
+  //   } else {
+  //     // If no direct rate, try to go through cUSD as the base currency
+  //     if (from !== 'CUSD' && to !== 'CUSD') {
+  //       try {
+  //         // Be careful with recursion here - we need to avoid infinite loops
+  //         const rateFromTocUSD = this.convertAmount(1, from, 'cUSD');
+  //         const ratecUSDToTo = this.convertAmount(1, 'cUSD', to);
+  //         return amount * rateFromTocUSD * ratecUSDToTo;
+  //       } catch (e) {
+  //         console.warn('Error in recursive conversion:', e);
+  //       }
+  //     }
 
-      // Default to 1:1 conversion if we can't find a rate
-      console.warn(`No exchange rate found for ${from} to ${to}, using 1:1 rate`);
-      return amount;
-    }
-  }
+  //     // Default to 1:1 conversion if we can't find a rate
+  //     console.warn(`No exchange rate found for ${from} to ${to}, using 1:1 rate`);
+  //     return amount;
+  //   }
+  // }
 };
 
 export default MentoService;
