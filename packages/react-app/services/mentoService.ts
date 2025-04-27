@@ -4,7 +4,9 @@ import { celo } from 'viem/chains';
 // Mock exchange rates for development - in production, these would come from Mento contracts
 // Reference: https://github.com/mento-protocol/mento-deployment
 // These rates are approximate and would be fetched from the Mento Oracle in production
-const MOCK_EXCHANGE_RATES = {
+type ExchangeRateKey = 'cUSD_cEUR' | 'cUSD_cREAL' | 'cEUR_cREAL' | 'cEUR_cUSD' | 'cREAL_cUSD' | 'cREAL_cEUR';
+
+const MOCK_EXCHANGE_RATES: Record<ExchangeRateKey, number> = {
   'cUSD_cEUR': 0.92, // 1 cUSD = 0.92 cEUR
   'cUSD_cREAL': 5.05, // 1 cUSD = 5.05 cREAL
   'cEUR_cREAL': 5.49, // 1 cEUR = 5.49 cREAL
@@ -62,10 +64,10 @@ export const MentoService = {
     // In a real implementation, we would call the Mento Oracle contracts here
     // Reference: https://github.com/mento-protocol/mento-deployment/tree/main/contracts/oracles
     // For now, we'll use mock exchange rates
-    if (MOCK_EXCHANGE_RATES[exchangeKey]) {
-      return MOCK_EXCHANGE_RATES[exchangeKey];
-    } else if (MOCK_EXCHANGE_RATES[reverseExchangeKey]) {
-      return 1 / MOCK_EXCHANGE_RATES[reverseExchangeKey];
+    if (exchangeKey in MOCK_EXCHANGE_RATES) {
+      return MOCK_EXCHANGE_RATES[exchangeKey as ExchangeRateKey];
+    } else if (reverseExchangeKey in MOCK_EXCHANGE_RATES) {
+      return 1 / MOCK_EXCHANGE_RATES[reverseExchangeKey as ExchangeRateKey];
     } else {
       // If no direct rate, try to go through cUSD as the base currency
       if (from !== 'CUSD' && to !== 'CUSD') {
@@ -97,10 +99,10 @@ export const MentoService = {
     const reverseExchangeKey = `${to}_${from}`;
 
     // Use mock exchange rates for now
-    if (MOCK_EXCHANGE_RATES[exchangeKey]) {
-      return amount * MOCK_EXCHANGE_RATES[exchangeKey];
-    } else if (MOCK_EXCHANGE_RATES[reverseExchangeKey]) {
-      return amount / MOCK_EXCHANGE_RATES[reverseExchangeKey];
+    if (exchangeKey in MOCK_EXCHANGE_RATES) {
+      return amount * MOCK_EXCHANGE_RATES[exchangeKey as ExchangeRateKey];
+    } else if (reverseExchangeKey in MOCK_EXCHANGE_RATES) {
+      return amount / MOCK_EXCHANGE_RATES[reverseExchangeKey as ExchangeRateKey];
     } else {
       // If no direct rate, try to go through cUSD as the base currency
       if (from !== 'CUSD' && to !== 'CUSD') {
