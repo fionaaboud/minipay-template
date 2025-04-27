@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useWeb3Context, WalletType } from '@/contexts/useWeb3Context';
 import { Balance } from '@/types/netsplit';
 import MentoService from '@/services/mentoService';
+import { Address } from 'viem'; // Import Address type
 
 interface UniversalPayButtonProps {
   balance: Balance;
@@ -69,7 +70,8 @@ export default function UniversalPayButton({ balance, onPaymentComplete }: Unive
       }
 
       // Send the payment using the selected currency
-      const tx = await sendStablecoin(highestOwed.walletAddress, amountToSend, paymentCurrency);
+      // Cast walletAddress to Address type as preceding checks ensure it's defined
+      const tx = await sendStablecoin(highestOwed.walletAddress as Address, amountToSend, paymentCurrency);
 
       // Call the callback to update the UI
       onPaymentComplete();
