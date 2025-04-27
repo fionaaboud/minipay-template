@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { v4 as uuidv4 } from 'uuid';
 import { useWeb3Context } from './useWeb3Context';
 import { Balance, Expense, Group, Member, Payment, SplitDetail, SplitType } from '@/types/netsplit';
+import { Address } from 'viem'; // Import Address type
 // Import only what we need
 
 interface NetsplitContextType {
@@ -292,7 +293,8 @@ export const NetsplitProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       // Send payment using wallet
       console.log(`Sending ${amount} ${currency} to ${toMember.walletAddress}`);
-      const tx = await sendCUSD(toMember.walletAddress, amount);
+      // Cast walletAddress to Address type as preceding checks ensure it's defined
+      const tx = await sendCUSD(toMember.walletAddress as Address, amount);
       console.log('Transaction successful:', tx);
 
       // Record the payment
