@@ -10,6 +10,7 @@ import {
     parseEther,
     stringToHex,
     Address, // Import the Address type
+    Abi, // Import the Abi type
 } from "viem";
 import { celo, celoAlfajores } from "viem/chains";
 
@@ -78,7 +79,7 @@ export const useWeb3 = () => {
 
         const tx = await walletClient.writeContract({
             address: getCUSDAddress(),
-            abi: StableTokenABI.abi,
+            abi: StableTokenABI.abi as Abi, // Cast ABI to Abi type
             functionName: "transfer",
             account: address,
             args: [to, amountInWei],
@@ -129,7 +130,7 @@ export const useWeb3 = () => {
         });
 
         const minipayNFTContract = getContract({
-            abi: MinipayNFTABI.abi,
+            abi: MinipayNFTABI.abi as Abi, // Cast ABI to Abi type
             address: getNFTContractAddress(),
             client: getPublicClient(),
         });
