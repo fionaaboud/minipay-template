@@ -54,7 +54,7 @@ function ClientPageContent() {
             }
         };
         initClient();
-    }, []);
+    }, [getUserAddress, createClient]);
 
     useEffect(() => {
         if (address) {
@@ -69,7 +69,7 @@ function ClientPageContent() {
             };
             getData();
         }
-    }, [address]);
+    }, [address, getNFTs]);
 
     async function sendingCUSD() {
         if (address) {

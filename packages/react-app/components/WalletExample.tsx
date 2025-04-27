@@ -7,11 +7,15 @@ import ClientOnly from "./ClientOnly";
 
 function WalletExampleContent() {
   const [address, setAddress] = useState<string | null>(null);
+import { useCallback } from "react"; // Import useCallback
+
+function WalletExampleContent() {
+  const [address, setAddress] = useState<string | null>(null);
   const [isMainnet, setIsMainnet] = useState<boolean>(false);
   const [isMiniPay, setIsMiniPay] = useState<boolean>(false);
 
-  // Function to create a wallet client
-  const createClient = async () => {
+  // Function to create a wallet client, wrapped in useCallback
+  const createClient = useCallback(async () => {
     if (typeof window !== "undefined" && window.ethereum) {
       try {
         // Check if we're in MiniPay environment
@@ -36,7 +40,7 @@ function WalletExampleContent() {
       }
     }
     return null;
-  };
+  }, [isMainnet]); // Add isMainnet as dependency for useCallback
 
   // Toggle between mainnet and testnet
   const toggleNetwork = () => {
@@ -49,7 +53,7 @@ function WalletExampleContent() {
     if (typeof window !== "undefined") {
       createClient();
     }
-  }, [isMainnet]);
+  }, [isMainnet, createClient]); // Add createClient to useEffect dependencies
 
   return (
     <div className="p-4 border rounded-lg bg-gray-50 my-4">
