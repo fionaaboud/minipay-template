@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useWeb3Context, WalletType } from '@/contexts/useWeb3Context';
 import { Balance } from '@/types/netsplit';
+import MentoService from '@/services/mentoService';
 
 interface UniversalPayButtonProps {
   balance: Balance;
