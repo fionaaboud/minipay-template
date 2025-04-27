@@ -32,7 +32,7 @@ const MINIPAY_NFT_CONTRACT_TESTNET = "0xE8F4699baba6C86DA9729b1B0a1DA1Bd4136eFeF
 const cUSDTokenAddressMainnet = "0x765DE816845861e75A25fCA122bb6898B8B1282a"; // Mainnet cUSD
 
 export const useWeb3 = () => {
-    const [address, setAddress] = useState<string | null>(null);
+    const [address, setAddress] = useState<Address | null>(null); // Use Address type
     const [isMainnet, setIsMainnet] = useState<boolean>(false);
 
     // Get the appropriate chain and client based on network selection
@@ -176,9 +176,9 @@ export const useWeb3 = () => {
                     transport: custom(window.ethereum),
                 });
 
-                const [address] = await client.getAddresses();
-                setAddress(address);
-                return { client, address, isMiniPay };
+                const [userAddress] = await client.getAddresses(); // Use different variable name to avoid shadowing
+                setAddress(userAddress); // Set state with Address type
+                return { client, address: userAddress, isMiniPay }; // Return the correct Address type
             } catch (error) {
                 console.error("Error creating wallet client:", error);
                 return null;
