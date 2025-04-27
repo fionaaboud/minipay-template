@@ -219,6 +219,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
         functionName: "transfer",
         account: address as Address, // Cast non-null address state to Address
         args: [to, amountInWei], // 'to' is already Address type
+        chain: getChain(), // Add the chain property
       });
 
       console.log("Transaction submitted:", tx);
