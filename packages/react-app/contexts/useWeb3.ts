@@ -9,6 +9,7 @@ import {
     http,
     parseEther,
     stringToHex,
+    Address, // Import the Address type
 } from "viem";
 import { celo, celoAlfajores } from "viem/chains";
 
