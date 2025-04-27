@@ -97,13 +97,18 @@ export const useWeb3 = () => {
             chain: getChain(),
         });
 
-        let [address] = await walletClient.getAddresses();
+        let [currentAddress] = await walletClient.getAddresses(); // Use a different name to avoid conflict if needed, though shadowing is fine here.
+
+        // Ensure address is available before proceeding
+        if (!currentAddress) {
+            throw new Error("User address not found. Cannot mint NFT.");
+        }
 
         const tx = await walletClient.writeContract({
             address: getNFTContractAddress(),
-            abi: MinipayNFTABI.abi,
+            abi: MinipayNFTABI.abi as Abi, // Cast ABI to Abi type
             functionName: "safeMint",
-            account: address,
+            account: currentAddress, // Use the non-null address
             args: [
                 address,
                 "https://cdn-production-opera-website.operacdn.com/staticfiles/assets/images/sections/2023/hero-top/products/minipay/minipay__desktop@2x.a17626ddb042.webp",
