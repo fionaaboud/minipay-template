@@ -4,7 +4,9 @@ import { celo } from 'viem/chains';
 // Mock exchange rates for development - in production, these would come from Mento contracts
 // Reference: https://github.com/mento-protocol/mento-deployment
 // These rates are approximate and would be fetched from the Mento Oracle in production
-const MOCK_EXCHANGE_RATES = {
+type ExchangeRateKey = 'cUSD_cEUR' | 'cUSD_cREAL' | 'cEUR_cREAL' | 'cEUR_cUSD' | 'cREAL_cUSD' | 'cREAL_cEUR';
+
+const MOCK_EXCHANGE_RATES: Record<ExchangeRateKey, number> = {
   'cUSD_cEUR': 0.92, // 1 cUSD = 0.92 cEUR
   'cUSD_cREAL': 5.05, // 1 cUSD = 5.05 cREAL
   'cEUR_cREAL': 5.49, // 1 cEUR = 5.49 cREAL
@@ -62,10 +64,10 @@ export const MentoService = {
     // In a real implementation, we would call the Mento Oracle contracts here
     // Reference: https://github.com/mento-protocol/mento-deployment/tree/main/contracts/oracles
     // For now, we'll use mock exchange rates
-    if (MOCK_EXCHANGE_RATES[exchangeKey]) {
-      return MOCK_EXCHANGE_RATES[exchangeKey];
-    } else if (MOCK_EXCHANGE_RATES[reverseExchangeKey]) {
-      return 1 / MOCK_EXCHANGE_RATES[reverseExchangeKey];
+    if (exchangeKey in MOCK_EXCHANGE_RATES) {
+      return MOCK_EXCHANGE_RATES[exchangeKey as ExchangeRateKey];
+    } else if (reverseExchangeKey in MOCK_EXCHANGE_RATES) {
+      return 1 / MOCK_EXCHANGE_RATES[reverseExchangeKey as ExchangeRateKey];
     } else {
       // If no direct rate, try to go through cUSD as the base currency
       if (from !== 'CUSD' && to !== 'CUSD') {
@@ -86,39 +88,39 @@ export const MentoService = {
   },
 
   // Synchronous version for use in balance calculations
-  convertAmount(amount: number, fromCurrency: string, toCurrency: string): number {
-    if (fromCurrency === toCurrency) return amount;
+  // convertAmount(amount: number, fromCurrency: string, toCurrency: string): number {
+  //   if (fromCurrency === toCurrency) return amount;
 
-    // Normalize currency names
-    const from = fromCurrency.toUpperCase();
-    const to = toCurrency.toUpperCase();
+  //   // Normalize currency names
+  //   const from = fromCurrency.toUpperCase();
+  //   const to = toCurrency.toUpperCase();
 
-    const exchangeKey = `${from}_${to}`;
-    const reverseExchangeKey = `${to}_${from}`;
+  //   const exchangeKey = `${from}_${to}`;
+  //   const reverseExchangeKey = `${to}_${from}`;
 
-    // Use mock exchange rates for now
-    if (MOCK_EXCHANGE_RATES[exchangeKey]) {
-      return amount * MOCK_EXCHANGE_RATES[exchangeKey];
-    } else if (MOCK_EXCHANGE_RATES[reverseExchangeKey]) {
-      return amount / MOCK_EXCHANGE_RATES[reverseExchangeKey];
-    } else {
-      // If no direct rate, try to go through cUSD as the base currency
-      if (from !== 'CUSD' && to !== 'CUSD') {
-        try {
-          // Be careful with recursion here - we need to avoid infinite loops
-          const rateFromTocUSD = this.convertAmount(1, from, 'cUSD');
-          const ratecUSDToTo = this.convertAmount(1, 'cUSD', to);
-          return amount * rateFromTocUSD * ratecUSDToTo;
-        } catch (e) {
-          console.warn('Error in recursive conversion:', e);
-        }
-      }
+  //   // Use mock exchange rates for now
+  //   if (exchangeKey in MOCK_EXCHANGE_RATES) {
+  //     return amount * MOCK_EXCHANGE_RATES[exchangeKey as ExchangeRateKey];
+  //   } else if (reverseExchangeKey in MOCK_EXCHANGE_RATES) {
+  //     return amount / MOCK_EXCHANGE_RATES[reverseExchangeKey as ExchangeRateKey];
+  //   } else {
+  //     // If no direct rate, try to go through cUSD as the base currency
+  //     if (from !== 'CUSD' && to !== 'CUSD') {
+  //       try {
+  //         // Be careful with recursion here - we need to avoid infinite loops
+  //         const rateFromTocUSD = this.convertAmount(1, from, 'cUSD');
+  //         const ratecUSDToTo = this.convertAmount(1, 'cUSD', to);
+  //         return amount * rateFromTocUSD * ratecUSDToTo;
+  //       } catch (e) {
+  //         console.warn('Error in recursive conversion:', e);
+  //       }
+  //     }
 
-      // Default to 1:1 conversion if we can't find a rate
-      console.warn(`No exchange rate found for ${from} to ${to}, using 1:1 rate`);
-      return amount;
-    }
-  }
+  //     // Default to 1:1 conversion if we can't find a rate
+  //     console.warn(`No exchange rate found for ${from} to ${to}, using 1:1 rate`);
+  //     return amount;
+  //   }
+  // }
 };
 
 export default MentoService;

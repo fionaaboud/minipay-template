@@ -88,16 +88,16 @@ export default function BalanceDetailDialog({
 
         <p className="text-sm text-gray-600 mb-4">
           These balances show the net amount owed between members after canceling out mutual expenses across all transactions.
-          For example, if you owe someone $50 and they owe you $30, you'll only see that you owe them $20.
+          For example, if you owe someone $50 and they owe you $30, you&apos;ll only see that you owe them $20.
         </p>
         <div className="bg-blue-50 p-3 rounded-lg mb-4 text-sm text-blue-800">
-          <strong>New!</strong> We've improved the balance calculation to combine all expenses.
+          <strong>New!</strong> We&apos;ve improved the balance calculation to combine all expenses.
           If you owe someone $100 and they owe you $100, your balance will be $0.
         </div>
 
         <div className={`p-4 rounded-lg mb-6 ${balance.balance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
           <div className="font-medium">
-            {balance.name}'s Balance
+            {balance.name}&apos;s Balance
           </div>
           <div className={`text-xl font-bold ${balance.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {balance.balance >= 0

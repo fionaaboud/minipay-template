@@ -85,7 +85,7 @@ export default function ViewBalancesDialog({
           If you paid for someone and they also paid for you, only the difference is shown.
         </p>
         <div className="bg-blue-50 p-3 rounded-lg mb-4 text-sm text-blue-800">
-          <strong>New!</strong> We've improved the balance calculation to combine all expenses.
+          <strong>New!</strong> We&apos;ve improved the balance calculation to combine all expenses.
           If you owe someone $100 and they owe you $100, your balance will be $0.
         </div>
 

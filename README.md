@@ -46,21 +46,25 @@ The app provides a seamless experience for managing shared expenses among friend
 Netsplit offers a comprehensive set of features for bill splitting and expense management:
 
 - **Group Management**
+
   - Create and manage expense groups
   - Add members to groups via email
   - Track group expenses and balances
 
 - **Expense Splitting**
+
   - Equal splits: divide expenses equally among group members
   - Custom splits: specify exact amounts for each member
   - Percentage splits: allocate expenses by percentage
 
 - **Multi-Currency Support**
+
   - Support for Celo stablecoins (cUSD, cEUR, cREAL)
   - Currency conversion using Mento Protocol rates
   - Set individual currency preferences
 
 - **Balance Tracking**
+
   - View overall group balances
   - See detailed breakdown of who owes what
   - Track payment history
@@ -96,30 +100,31 @@ Netsplit is built using modern web technologies and blockchain tools:
 ### Installation
 
 1. Clone the repository
+
    ```sh
    git clone https://github.com/fionaaboud/minipay-template.git
    cd minipay-template
    ```
 
 2. Install dependencies
+
    ```sh
    yarn
-   # or
-   npm install
    ```
 
 3. Set up environment variables
+
    ```sh
    cp packages/react-app/.env.template packages/react-app/.env
    ```
+
    Then add your WalletConnect Cloud Project ID to the .env file
 
 4. Start the development server
+
    ```sh
    cd packages/react-app
    yarn dev
-   # or
-   npm run dev
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
@@ -168,6 +173,7 @@ Netsplit supports multiple currencies through the Mento Protocol:
 - **cREAL (Celo Brazilian Real)**: Brazilian currency option
 
 Users can:
+
 - Enter expenses in any supported currency
 - Set their preferred currency for display
 - Pay in any supported currency
@@ -185,6 +191,7 @@ Netsplit is designed to work seamlessly with [MiniPay](https://www.opera.com/pro
 - **Streamlined Payments**: Direct integration for settling debts
 
 To use Netsplit with MiniPay:
+
 1. Install the [MiniPay app](https://play.google.com/store/apps/details?id=com.opera.minipay)
 2. Open the Netsplit app URL in MiniPay
 3. The app will automatically connect to your MiniPay wallet

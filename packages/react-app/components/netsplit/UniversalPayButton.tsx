@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useWeb3Context, WalletType } from '@/contexts/useWeb3Context';
 import { Balance } from '@/types/netsplit';
+import MentoService from '@/services/mentoService';
+import { Address } from 'viem'; // Import Address type
 
 interface UniversalPayButtonProps {
   balance: Balance;
@@ -58,8 +60,18 @@ export default function UniversalPayButton({ balance, onPaymentComplete }: Unive
       // Convert amount to string with 2 decimal places
       const amountToSend = highestOwed.amount.toFixed(2);
 
+      // Ensure wallet address exists before sending (for TypeScript safety)
+      if (!highestOwed.walletAddress) {
+        // This case should theoretically not be reachable due to the check before rendering the button
+        console.error("Critical Error: handlePayBalance called without wallet address for", highestOwed.email);
+        setError("Internal error: Missing wallet address.");
+        setIsProcessing(false);
+        return;
+      }
+
       // Send the payment using the selected currency
-      const tx = await sendStablecoin(highestOwed.walletAddress, amountToSend, paymentCurrency);
+      // Cast walletAddress to Address type as preceding checks ensure it's defined
+      const tx = await sendStablecoin(highestOwed.walletAddress as Address, amountToSend, paymentCurrency);
 
       // Call the callback to update the UI
       onPaymentComplete();
@@ -139,7 +151,7 @@ export default function UniversalPayButton({ balance, onPaymentComplete }: Unive
             </div>
             {paymentCurrency !== highestOwed.currency && (
               <div className="text-xs text-gray-500 mb-2">
-                You'll pay {MentoService.formatAmountWithCurrency(highestOwed.amount, paymentCurrency)}
+                You&apos;ll pay {MentoService.formatAmountWithCurrency(highestOwed.amount, paymentCurrency)}
                 (equivalent to {MentoService.formatAmountWithCurrency(highestOwed.amount, highestOwed.currency || 'cUSD')})
               </div>
             )}

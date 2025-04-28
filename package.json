@@ -1,24 +1,24 @@
 {
-  "name": "celo-composer-minipay-template",
+  "name": "netsplit",
   "version": "1.0.0",
-  "description": "Custom Celo Composer project.",
+  "description": "Decentralized bill splitting application.",
   "private": true,
-  "author": "Celo",
+  "author": "Netsplit",
   "license": "MIT",
   "scripts": {
-    "react-app:dev": "yarn workspace @celo-composer-minipay-template/react-app dev",
-    "react-app:build": "yarn workspace @celo-composer-minipay-template/react-app build",
-    "react-app:start": "yarn workspace @celo-composer-minipay-template/react-app start",
-    "react-app:lint": "yarn workspace @celo-composer-minipay-template/react-app lint"
+    "react-app:dev": "yarn workspace @netsplit/react-app dev",
+    "react-app:build": "yarn workspace @netsplit/react-app build",
+    "react-app:start": "yarn workspace @netsplit/react-app start",
+    "react-app:lint": "yarn workspace @netsplit/react-app lint"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/celo-org/celo-composer.git"
+    "url": "git+https://github.com/fionaaboud/minipay-template.git"
   },
   "bugs": {
-    "url": "https://github.com/celo-org/celo-composer/issues"
+    "url": "https://github.com/fionaaboud/minipay-template/issues"
   },
-  "homepage": "https://github.com/celo-org/celo-composer/blob/main/README.md",
+  "homepage": "https://github.com/fionaaboud/minipay-template/blob/main/README.md",
   "workspaces": [
     "packages/*",
     "hardhat/*"

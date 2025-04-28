@@ -12,6 +12,8 @@ import {
   stringToHex,
   WalletClient,
   PublicClient,
+  Address, // Import Address type
+  Abi, // Import Abi type
 } from "viem";
 import { celo, celoAlfajores } from "viem/chains";
 
@@ -39,19 +41,19 @@ const publicClientMainnet = createPublicClient({
 const cUSDTokenAddressTestnet = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // Testnet
 
 // Mainnet addresses
-const cUSDTokenAddressMainnet = "0x765DE816845861e75A25fCA122bb6898B8B1282a"; // Mainnet cUSD
+const cUSDTokenAddressMainnet = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as Address; // Mainnet cUSD (Cast to Address)
 
 interface Web3ContextType {
-  address: string | null;
+  address: Address | null; // Use Address type
   isMainnet: boolean;
   walletType: WalletType;
   isConnected: boolean;
   isConnecting: boolean;
   connectWallet: (walletType?: WalletType) => Promise<boolean>;
   disconnectWallet: () => void;
-  sendCUSD: (to: string, amount: string) => Promise<any>;
-  sendStablecoin: (to: string, amount: string, currency?: string) => Promise<any>;
-  getStablecoinAddress: (currency?: string) => string;
+  sendCUSD: (to: Address, amount: string) => Promise<any>; // Use Address type for 'to'
+  sendStablecoin: (to: Address, amount: string, currency?: string) => Promise<any>; // Use Address type for 'to'
+  getStablecoinAddress: (currency?: string) => Address; // Use Address type for return
   toggleNetwork: () => void;
   supportedCurrencies: string[];
 }
@@ -59,7 +61,7 @@ interface Web3ContextType {
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
 
 export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [address, setAddress] = useState<string | null>(null);
+  const [address, setAddress] = useState<Address | null>(null); // Use Address type
   const [isMainnet, setIsMainnet] = useState<boolean>(false);
   const [walletType, setWalletType] = useState<WalletType>(WalletType.NONE);
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -69,7 +71,9 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Get the appropriate chain and client based on network selection
   const getChain = () => isMainnet ? celo : celoAlfajores;
   const getPublicClient = () => isMainnet ? publicClientMainnet : publicClientTestnet;
-  const getCUSDAddress = () => isMainnet ? cUSDTokenAddressMainnet : cUSDTokenAddressTestnet;
+  // Testnet address needs casting as well if used directly with viem functions expecting Address
+  const cUSDTokenAddressTestnetTyped = cUSDTokenAddressTestnet as Address;
+  const getCUSDAddress = (): Address => isMainnet ? cUSDTokenAddressMainnet : cUSDTokenAddressTestnetTyped; // Ensure return type is Address
 
   // Check for MiniPay on initial load
   useEffect(() => {
@@ -106,7 +110,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       let client: WalletClient | null = null;
-      let userAddress: string | undefined;
+      let userAddress: Address | undefined; // Use Address type
 
       switch (type) {
         case WalletType.MINIPAY:
@@ -179,20 +183,20 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsConnected(false);
   };
 
-  // Stablecoin addresses on Celo mainnet
-  const STABLECOIN_ADDRESSES = {
-    cUSD: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
-    cEUR: '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73',
-    cREAL: '0xe8537a3d056DA446677B9E9d6c5dB704EaAb4787'
+  // Stablecoin addresses on Celo mainnet (Cast to Address)
+  const STABLECOIN_ADDRESSES: { [key: string]: Address } = {
+    cUSD: '0x765DE816845861e75A25fCA122bb6898B8B1282a' as Address,
+    cEUR: '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73' as Address,
+    cREAL: '0xe8537a3d056DA446677B9E9d6c5dB704EaAb4787' as Address
   };
 
   // Get stablecoin address
-  const getStablecoinAddress = (currency: string = 'cUSD') => {
-    return STABLECOIN_ADDRESSES[currency] || STABLECOIN_ADDRESSES.cUSD;
+  const getStablecoinAddress = (currency: string = 'cUSD'): Address => { // Return Address type
+    return STABLECOIN_ADDRESSES[currency.toUpperCase()] || STABLECOIN_ADDRESSES.cUSD;
   };
 
   // Send any stablecoin
-  const sendStablecoin = async (to: string, amount: string, currency: string = 'cUSD') => {
+  const sendStablecoin = async (to: Address, amount: string, currency: string = 'cUSD') => { // Use Address type for 'to'
     if (!walletClient || !address) {
       throw new Error("Wallet not connected");
     }
@@ -210,11 +214,12 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       console.log("Initiating transfer transaction...");
       const tx = await walletClient.writeContract({
-        address: tokenAddress,
-        abi: StableTokenABI.abi,
+        address: tokenAddress, // Already Address type from getStablecoinAddress
+        abi: StableTokenABI.abi as Abi, // Cast ABI
         functionName: "transfer",
-        account: address,
-        args: [to, amountInWei],
+        account: address as Address, // Cast non-null address state to Address
+        args: [to, amountInWei], // 'to' is already Address type
+        chain: getChain(), // Add the chain property
       });
 
       console.log("Transaction submitted:", tx);
@@ -233,7 +238,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // For backward compatibility
-  const sendCUSD = async (to: string, amount: string) => {
+  const sendCUSD = async (to: Address, amount: string) => { // Use Address type for 'to'
     return sendStablecoin(to, amount, 'cUSD');
   };
 

@@ -9,6 +9,8 @@ import {
     http,
     parseEther,
     stringToHex,
+    Address, // Import the Address type
+    Abi, // Import the Abi type
 } from "viem";
 import { celo, celoAlfajores } from "viem/chains";
 
@@ -32,14 +34,14 @@ const MINIPAY_NFT_CONTRACT_TESTNET = "0xE8F4699baba6C86DA9729b1B0a1DA1Bd4136eFeF
 const cUSDTokenAddressMainnet = "0x765DE816845861e75A25fCA122bb6898B8B1282a"; // Mainnet cUSD
 
 export const useWeb3 = () => {
-    const [address, setAddress] = useState<string | null>(null);
+    const [address, setAddress] = useState<Address | null>(null); // Use Address type
     const [isMainnet, setIsMainnet] = useState<boolean>(false);
 
     // Get the appropriate chain and client based on network selection
     const getChain = () => isMainnet ? celo : celoAlfajores;
     const getPublicClient = () => isMainnet ? publicClientMainnet : publicClientTestnet;
-    const getCUSDAddress = () => isMainnet ? cUSDTokenAddressMainnet : cUSDTokenAddressTestnet;
-    const getNFTContractAddress = () => isMainnet ? MINIPAY_NFT_CONTRACT_TESTNET : MINIPAY_NFT_CONTRACT_TESTNET; // Using testnet for both until mainnet is available
+    const getCUSDAddress = (): Address => isMainnet ? cUSDTokenAddressMainnet : cUSDTokenAddressTestnet; // Explicitly return Address
+    const getNFTContractAddress = (): Address => isMainnet ? MINIPAY_NFT_CONTRACT_TESTNET : MINIPAY_NFT_CONTRACT_TESTNET; // Explicitly return Address. Using testnet for both until mainnet is available
 
     // Toggle between mainnet and testnet
     const toggleNetwork = () => {
@@ -77,7 +79,7 @@ export const useWeb3 = () => {
 
         const tx = await walletClient.writeContract({
             address: getCUSDAddress(),
-            abi: StableTokenABI.abi,
+            abi: StableTokenABI.abi as Abi, // Cast ABI to Abi type
             functionName: "transfer",
             account: address,
             args: [to, amountInWei],
@@ -96,15 +98,20 @@ export const useWeb3 = () => {
             chain: getChain(),
         });
 
-        let [address] = await walletClient.getAddresses();
+        let [currentAddress] = await walletClient.getAddresses(); // Use a different name to avoid conflict if needed, though shadowing is fine here.
+
+        // Ensure address is available before proceeding
+        if (!currentAddress) {
+            throw new Error("User address not found. Cannot mint NFT.");
+        }
 
         const tx = await walletClient.writeContract({
             address: getNFTContractAddress(),
-            abi: MinipayNFTABI.abi,
+            abi: MinipayNFTABI.abi as Abi, // Cast ABI to Abi type
             functionName: "safeMint",
-            account: address,
+            account: currentAddress, // Use the non-null address
             args: [
-                address,
+                currentAddress, // Use the non-null address
                 "https://cdn-production-opera-website.operacdn.com/staticfiles/assets/images/sections/2023/hero-top/products/minipay/minipay__desktop@2x.a17626ddb042.webp",
             ],
         });
@@ -123,7 +130,7 @@ export const useWeb3 = () => {
         });
 
         const minipayNFTContract = getContract({
-            abi: MinipayNFTABI.abi,
+            abi: MinipayNFTABI.abi as Abi, // Cast ABI to Abi type
             address: getNFTContractAddress(),
             client: getPublicClient(),
         });
@@ -176,9 +183,9 @@ export const useWeb3 = () => {
                     transport: custom(window.ethereum),
                 });
 
-                const [address] = await client.getAddresses();
-                setAddress(address);
-                return { client, address, isMiniPay };
+                const [userAddress] = await client.getAddresses(); // Use different variable name to avoid shadowing
+                setAddress(userAddress); // Set state with Address type
+                return { client, address: userAddress, isMiniPay }; // Return the correct Address type
             } catch (error) {
                 console.error("Error creating wallet client:", error);
                 return null;

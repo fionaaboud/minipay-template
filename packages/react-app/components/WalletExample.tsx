@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createWalletClient, custom } from "viem";
 import { celo, celoAlfajores } from "viem/chains";
 import ClientOnly from "./ClientOnly";
@@ -10,8 +10,8 @@ function WalletExampleContent() {
   const [isMainnet, setIsMainnet] = useState<boolean>(false);
   const [isMiniPay, setIsMiniPay] = useState<boolean>(false);
 
-  // Function to create a wallet client
-  const createClient = async () => {
+  // Function to create a wallet client, wrapped in useCallback
+  const createClient = useCallback(async () => {
     if (typeof window !== "undefined" && window.ethereum) {
       try {
         // Check if we're in MiniPay environment
@@ -36,7 +36,7 @@ function WalletExampleContent() {
       }
     }
     return null;
-  };
+  }, [isMainnet]); // Add isMainnet as dependency for useCallback
 
   // Toggle between mainnet and testnet
   const toggleNetwork = () => {
@@ -49,7 +49,7 @@ function WalletExampleContent() {
     if (typeof window !== "undefined") {
       createClient();
     }
-  }, [isMainnet]);
+  }, [isMainnet, createClient]); // Add createClient to useEffect dependencies
 
   return (
     <div className="p-4 border rounded-lg bg-gray-50 my-4">
@@ -65,14 +65,18 @@ function WalletExampleContent() {
       <div className="mb-4">
         <button
           onClick={toggleNetwork}
-          className={`px-4 py-2 rounded-md font-medium ${isMainnet ? 'bg-green-600 text-white' : 'bg-yellow-500 text-black'}`}
+          className={`px-4 py-2 rounded-md font-medium ${
+            isMainnet ? "bg-green-600 text-white" : "bg-yellow-500 text-black"
+          }`}
         >
-          {isMainnet ? 'Mainnet' : 'Testnet'} (Click to toggle)
+          {isMainnet ? "Mainnet" : "Testnet"} (Click to toggle)
         </button>
       </div>
       {address ? (
         <div className="mt-2">
-          <p>Connected Address: <span className="font-mono">{address}</span></p>
+          <p>
+            Connected Address: <span className="font-mono">{address}</span>
+          </p>
         </div>
       ) : (
         <p>Wallet not connected</p>
@@ -81,7 +85,7 @@ function WalletExampleContent() {
         <p>This example uses the following code:</p>
         <pre className="bg-gray-100 p-2 rounded overflow-x-auto mt-2">
           {`const client = createWalletClient({
-  chain: ${isMainnet ? 'celo' : 'celoAlfajores'},
+  chain: ${isMainnet ? "celo" : "celoAlfajores"},
   transport: custom(window.ethereum),
 });
 
